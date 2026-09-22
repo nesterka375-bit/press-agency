@@ -23,7 +23,7 @@ class Redactor(AbstractUser):
 
 
 class Newspaper(models.Model):
-    name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     content = models.TextField()
     published_date = models.DateField()
     topic = models.ForeignKey(
@@ -34,8 +34,8 @@ class Newspaper(models.Model):
     class Meta:
         ordering = (
             "-published_date",
-            "name",
+            "title",
         )
 
     def __str__(self):
-        return f"{self.name}. Topic: {self.topic.name}. Date: {self.published_date}"
+        return f"{self.title}. Topic: {self.topic.name}. Date: {self.published_date}"
