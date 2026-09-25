@@ -1,3 +1,6 @@
-.idea
-.venv
-__pycache__
+.idea/
+.venv/
+__pycache__/
+
+*.sqlite3
+db.sqlite3
