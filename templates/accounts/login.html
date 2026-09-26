@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+<title>Login - Press Agency</title>
+{% endblock %}
+
+{% block header %}
+<header class="masthead" style="background-image: url('{% static "assets/img/home-bg.jpg" %}')">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-8 col-lg-6 col-xl-5">
+                <div class="site-heading py-4">
+                    <h1 class="mb-3">Login</h1>
+                    <span class="subheading mb-4">Please enter your username and password</span>
+
+                    <!-- Message about wrong username or password -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show text-start mb-4 text-dark" role="alert">
+                            <small>Invalid username or password. Please try again.</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    <form method="post" action="{% url 'accounts:login' %}" class="text-start">
+                        {% csrf_token %}
+                        <!-- Username -->
+                        <div class="form-floating mb-3">
+                            <input type="text" name="username" class="form-control text-dark" id="id_username" placeholder="Username" required autofocus>
+                            <label for="id_username" class="text-muted">Username</label>
+                        </div>
+                        <!-- Password -->
+                        <div class="form-floating mb-4">
+                            <input type="password" name="password" class="form-control text-dark" id="id_password" placeholder="Password" required>
+                            <label for="id_password" class="text-muted">Password</label>
+                        </div>
+
+                        <input type="hidden" name="next" value="{{ next|default:'catalog:index' }}">
+
+                        <!-- Button Login -->
+                        <div class="d-grid">
+                            <button class="btn btn-primary text-uppercase py-3 fw-bold" type="submit">Log In</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block maincontent %}
+{% endblock %}

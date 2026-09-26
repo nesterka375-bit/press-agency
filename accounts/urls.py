@@ -1,9 +1,10 @@
-from accounts.views import login, logout
 from django.urls import path
+
+from accounts.views import CustomLoginView, CustomLogoutView
 
 app_name = "accounts"
 
 urlpatterns = [
-	path("login/", login, name="login"),
-	path("logout/", logout, name="logout"),
+	path("login/", CustomLoginView.as_view(), name="login"),
+	path("logout/", CustomLogoutView.as_view(), name="logout"),
 ]
