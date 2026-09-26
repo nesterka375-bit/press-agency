@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>Topic - Press Agency</title>
+{% endblock %}
+
+{%  block header %}
+  <header class="masthead" style="background-image: url('../../static/assets/img/home-bg.jpg')">
+    <div class="container position-relative px-4 px-lg-5">
+      <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
+          <div class="site-heading">
+            <h1>Topics</h1>
+            <span class="subheading">Browse newspapers by category</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+{% endblock %}
+
+{% block maincontent %}
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <div class="list-group list-group-flush mb-5">
+        {% for topic in topics %}
+          <div class="list-group-item d-flex justify-content-between align-items-center py-3 bg-transparent">
+            <span class="fs-5 fw-bold text-dark">{{ topic.name }}</span>
+            <span class="badge bg-primary rounded-pill px-3 py-2 fs-6">
+              {{ topic.newspapers_count }} news item{{ topic.newspapers_count|pluralize }}
+            </span>
+          </div>
+        {% empty %}
+          <p class="text-muted text-center my-4">No topics available.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

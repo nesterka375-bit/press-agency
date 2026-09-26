@@ -31,7 +31,7 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ms-auto py-4 py-lg-0">
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:index" %}">Home</a></li>
-            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">Topic</a></li>
+            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:topic_list" %}">Topics</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">Redactors</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">All posts</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">Contact</a></li>
@@ -55,16 +55,16 @@
     <!-- Page Header-->
     {% block header %}
     <header class="masthead" style="background-image: url('../static/assets/img/home-bg.jpg')">
-        <div class="container position-relative px-4 px-lg-5">
-            <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-md-10 col-lg-8 col-xl-7">
-                    <div class="site-heading">
-                        <h1>Press Agency</h1>
-                        <span class="subheading">Tracking system for publications by editors assigned to newspapers</span>
-                    </div>
-                </div>
+      <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+          <div class="col-md-10 col-lg-8 col-xl-7">
+            <div class="site-heading">
+                <h1>Press Agency</h1>
+                <span class="subheading">Tracking system for publications by editors assigned to newspapers</span>
             </div>
+          </div>
         </div>
+      </div>
     </header>
     {% endblock %}
     <!-- Main Content-->
