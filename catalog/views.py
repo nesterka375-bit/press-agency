@@ -1,6 +1,6 @@
 from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import generic
 
 from catalog.models import Newspaper, Topic
@@ -25,3 +25,26 @@ class TopicListView(generic.ListView):
         return Topic.objects.annotate(
             newspapers_count=Count("newspapers")
         ).order_by("name")
+
+
+class TopicDetailView(generic.DetailView):
+    model = Topic
+    template_name = "catalog/topic_detail.html"
+    context_object_name = "topic"
+    slug_field = "name"
+    slug_url_kwarg = "name"
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("newspapers__publishers")
+
+    def get_object(self, queryset=None):
+        name = self.kwargs.get("name")
+        topic = Topic.objects.filter(name__iexact=name).first()
+        if not topic:
+            for t in Topic.objects.all():
+                if t.name.lower() == name.lower():
+                    topic = t
+                    break
+        return get_object_or_404(
+            Topic.objects.filter(pk=topic.pk) if topic else Topic.objects.none()
+        )
