@@ -21,7 +21,7 @@
 </head>
   <body>
     <!-- Navigation-->
-    <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+    <nav class="navbar navbar-expand-lg navbar-dark" id="mainNav">
       <div class="container px-4 px-lg-5">
         <a class="navbar-brand" href="{% url "catalog:index" %}">Press Agency</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,17 +33,17 @@
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:index" %}">Home</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:topic_list" %}">Topics</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">Redactors</a></li>
-            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">All posts</a></li>
+            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">All news</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">Contact</a></li>
             {% if user.is_authenticated %}
               <li class="nav-item ms-lg-4">
-                <a class="nav-link px-lg-3 py-3 py-lg-4 fw-bold" href="{% url 'accounts:logout' %}">
+                <a class="nav-link px-lg-3 py-3 py-lg-4 fw-bold" href="{% url "accounts:logout" %}">
                   Logout ({{ user.username }})
                 </a>
               </li>
             {% else %}
               <li class="nav-item ms-lg-4">
-                <a class="nav-link px-lg-3 py-3 py-lg-4 fw-bold" href="{% url 'accounts:login' %}">
+                <a class="nav-link px-lg-3 py-3 py-lg-4 fw-bold" href="{% url "accounts:login" %}">
                   Login
                 </a>
               </li>
@@ -75,7 +75,7 @@
           <!-- Post preview-->
           {% for post in latest_posts %}
             <div class="post-preview">
-              <a href="post.html">
+              <a href="{% url "catalog:news_detail" name=post.topic.name|lower pk=post.id %}">
                 <h2 class="post-title">{{ post.topic }}</h2>
                 <h3 class="post-subtitle">{{ post.content|truncatechars:80 }}</h3>
               </a>

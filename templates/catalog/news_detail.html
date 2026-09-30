@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>{{ news.title }} - Press Agency</title>
+{% endblock %}
+
+{% block header %}
+<style>
+  #mainNav {
+    background-image: url('{% static "assets/img/home-bg.jpg" %}');
+    position: relative !important;
+  }
+  #mainNav .navbar-brand, #mainNav .nav-link {
+    -webkit-text-stroke: 1px #000000;
+
+    text-shadow:
+      -1px -1px 0 #000,
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000,
+       0px  2px 4px rgba(0, 0, 0, 0.8);
+
+    transition: color 0.2s ease-in-out, -webkit-text-stroke 0.2s ease-in-out;
+  }
+
+  #mainNav .navbar-brand:hover,
+  #mainNav .nav-link:hover {
+    color: #ffe600 !important;
+    -webkit-text-stroke: 1px #000000;
+  }
+</style>
+{% endblock %}
+
+{% block maincontent %}
+<div class="container px-4 px-lg-5 mt-5 pt-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <div class="post-preview">
+        <h2 class="post-title">{{ news.title }}</h2>
+        <p class="post-subtitle">{{ news.content }}</p>
+        <p class="post-meta">
+          Published on {{ news.published_date }} by
+          {% for publisher in news.publishers.all %}
+            {{ publisher.first_name }} {{ publisher.last_name }}{% if not forloop.last %}, {% endif %}
+          {% empty %}
+            Unknown Author
+          {% endfor %}
+        </p>
+      </div>
+      <hr class="my-4" />
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -48,3 +48,12 @@ class TopicDetailView(generic.DetailView):
         return get_object_or_404(
             Topic.objects.filter(pk=topic.pk) if topic else Topic.objects.none()
         )
+
+
+class NewsDetailView(generic.DetailView):
+    model = Newspaper
+    template_name = "catalog/news_detail.html"
+    context_object_name = "news"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("topic").prefetch_related("publishers")

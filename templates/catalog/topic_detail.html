@@ -21,26 +21,41 @@
 {% endblock %}
 
 {% block maincontent %}
-<div class="container px-4 px-lg-5">
-  <div class="row gx-4 gx-lg-5 justify-content-center">
-    <div class="col-md-10 col-lg-8 col-xl-7">
-      {% for newspaper in topic.newspapers.all %}
-        <div class="post-preview">
-          <h2 class="post-title">{{ newspaper.title }}</h2>
-          <p class="post-subtitle">{{ newspaper.content|truncatewords:80 }}</p>
-          <p class="post-meta">
-            Published on {{ newspaper.published_date }} by
-            {% for publisher in newspaper.publishers.all %}
-              {{ publisher.first_name }} {{ publisher.last_name }}{% if not forloop.last %}, {% endif %}
-            {% empty %}
-              Unknown Author
-            {% endfor %}
-          </p>
+<div class="container">
+  <div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="list-group list-group-flush mb-5">
+        {% for newspaper in topic.newspapers.all %}
+          <div class="post-preview">
+                <a href="{% url "catalog:news_detail" name=topic.name|lower pk=newspaper.id %}">
+                  <h2 class="post-title">{{ newspaper.title }}</h2>
+                  <h3 class="post-subtitle">{{ newspaper.content|truncatechars:80 }}</h3>
+                </a>
+                <p class="post-meta">
+                  Published by
+                  {% for publisher in newspaper.publishers.all %}
+                    <a href="#">{{ publisher.first_name }} {{ publisher.last_name }}</a>{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                    <span>Anonymous</span>
+                  {% endfor %}
+                  on {{ newspaper.published_date }}
+                </p>
+              </div>
+        {% empty %}
+          <p>No articles found in this topic.</p>
+        {% endfor %}
         </div>
-        <hr class="my-4" />
-      {% empty %}
-        <p class="text-muted text-center">No news articles found for this topic.</p>
-      {% endfor %}
+      </div>
+    </div>
+    <div class="row gx-4 gx-lg-5 justify-content-center mt-4 mb-5">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="d-flex justify-content-start">
+          <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:topic_list" %}">
+            &larr; Back to all topics
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -11,7 +11,7 @@
             <!-- Post previews -->
             {% for post in latest_posts %}
                 <div class="post-preview">
-                    <a href="#">
+                    <a href="{% url "catalog:news_detail" name=post.topic.name|lower pk=post.id %}">
                         <h2 class="post-title">{{ post.topic }}</h2>
                         <h3 class="post-subtitle">{{ post.content|truncatechars:80 }}</h3>
                     </a>
