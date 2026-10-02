@@ -3,7 +3,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 
-from catalog.models import Newspaper, Topic
+from catalog.models import Newspaper, Topic, Redactor
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -25,6 +25,18 @@ class TopicListView(generic.ListView):
         return Topic.objects.annotate(
             newspapers_count=Count("newspapers")
         ).order_by("name")
+
+
+class RedactorsListView(generic.ListView):
+    model = Redactor
+    template_name = "catalog/redactor_list.html"
+    context_object_name = "redactors"
+
+    def get_queryset(self):
+        return (Redactor.objects.exclude(username="admin")
+        .annotate(redactors_count=Count("newspapers"))
+        .order_by("username")
+        )
 
 
 class TopicDetailView(generic.DetailView):
@@ -57,3 +69,5 @@ class NewsDetailView(generic.DetailView):
 
     def get_queryset(self):
         return super().get_queryset().select_related("topic").prefetch_related("publishers")
+
+
