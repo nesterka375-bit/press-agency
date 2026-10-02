@@ -27,15 +27,16 @@ class TopicListView(generic.ListView):
         ).order_by("name")
 
 
-class RedactorsListView(generic.ListView):
+class RedactorListView(generic.ListView):
     model = Redactor
     template_name = "catalog/redactor_list.html"
     context_object_name = "redactors"
 
     def get_queryset(self):
-        return (Redactor.objects.exclude(username="admin")
-        .annotate(redactors_count=Count("newspapers"))
-        .order_by("username")
+        return (
+            Redactor.objects.exclude(username="admin")
+            .annotate(newspapers_count=Count("newspapers"))
+            .order_by("username")
         )
 
 
@@ -60,6 +61,25 @@ class TopicDetailView(generic.DetailView):
         return get_object_or_404(
             Topic.objects.filter(pk=topic.pk) if topic else Topic.objects.none()
         )
+
+
+class RedactorDetailView(generic.DetailView):
+    model = Redactor
+    template_name = "catalog/redactor_detail.html"
+    context_object_name = "redactor"
+    slug_field = "username"
+    slug_url_kwarg = "username"
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("newspapers__topic", "newspapers__publishers")
+        )
+
+    def get_object(self, queryset=None):
+        username = self.kwargs.get("username")
+        return get_object_or_404(Redactor, username__iexact=username)
 
 
 class NewsDetailView(generic.DetailView):

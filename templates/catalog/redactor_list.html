@@ -27,7 +27,7 @@
       <div class="list-group list-group-flush mb-5">
         {% for redactor in redactors %}
           <div class="list-group-item d-flex justify-content-between align-items-center py-3 bg-transparent">
-            <span class="fs-5 fw-bold text-dark"><a href="{% url "catalog:redactor_list" %}">{{ redactor.first_name }} {{ redactor.last_name }}</a></span>
+            <span class="fs-5 fw-bold text-dark"><a href="{% url "catalog:redactor_detail" name=redactor.username|lower %}">{{ redactor.first_name }} {{ redactor.last_name }}</a></span>
             <span class="badge bg-primary rounded-pill px-3 py-2 fs-6">
               {{ redactor.redactors_count }} news item{{ redactor.redactors_count|pluralize }}
             </span>

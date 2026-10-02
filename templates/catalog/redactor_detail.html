@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>{{ redactor.first_name }} {{ redactor.last_name }} - Press Agency</title>
+{% endblock %}
+
+{% block header %}
+<header class="masthead" style="background-image: url('{% static "assets/img/home-bg.jpg" %}'); background-size: cover; background-position: center;">
+  <div class="position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="site-heading">
+          <h1>{{ redactor.first_name }} {{ redactor.last_name }}</h1>
+          <span class="subheading"><br>Articles published by this redactor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block maincontent %}
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <div class="list-group list-group-flush mb-5">
+      {% for newspaper in redactor.newspapers.all %}
+        <div class="post-preview">
+          <a href="{% url "catalog:news_detail" name=newspaper.topic.name|lower pk=newspaper.id %}">
+            <h2 class="post-title">{{ newspaper.title }}</h2>
+            <h3 class="post-subtitle">{{ newspaper.content|truncatechars:80 }}</h3>
+          </a>
+          <p class="post-meta">
+            Topic: <a href="{% url "catalog:topic_detail" name=newspaper.topic.name|lower %}">{{ newspaper.topic.name }}</a> |
+            Published on {{ newspaper.published_date }}
+          </p>
+        </div>
+        <hr class="my-4" />
+      {% empty %}
+        <p class="text-muted text-center my-4">No articles written by this redactor yet.</p>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row gx-4 gx-lg-5 justify-content-center mt-2 mb-5">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <div class="d-flex justify-content-start">
+        <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:redactor_list" %}">
+          &larr; Back to all redactors
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
