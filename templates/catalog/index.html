@@ -32,8 +32,14 @@
             {% endfor %}
 
             <!-- Pager -->
-            <div class="d-flex justify-content-end mb-4">
-                <a class="btn btn-primary text-uppercase" href="#">All news →</a>
+            <div class="row gx-4 gx-lg-5 justify-content-center mt-4 mb-5">
+              <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="d-flex justify-content-end">
+                  <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:all_news_list" %}">
+                    All news &rarr;
+                  </a>
+                </div>
+              </div>
             </div>
         </div>
     </div>
