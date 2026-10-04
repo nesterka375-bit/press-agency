@@ -40,6 +40,14 @@ class RedactorListView(generic.ListView):
         )
 
 
+class AllNewsListView(generic.ListView):
+    model = Newspaper
+    template_name = "catalog/all_news_list.html"
+    context_object_name = "newspapers"
+    slug_field = "name"
+    slug_url_kwarg = "name"
+
+
 class TopicDetailView(generic.DetailView):
     model = Topic
     template_name = "catalog/topic_detail.html"

@@ -33,7 +33,7 @@
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:index" %}">Home</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:topic_list" %}">Topics</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:redactor_list" %}">Redactors</a></li>
-            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">All news</a></li>
+            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:all_news_list" %}">All news</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">Contact</a></li>
             {% if user.is_authenticated %}
               <li class="nav-item ms-lg-4">
