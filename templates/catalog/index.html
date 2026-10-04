@@ -18,7 +18,7 @@
                     <p class="post-meta">
                         Posted by
                         {% for publisher in post.publishers.all %}
-                            <a href="#">{{ publisher.first_name }} {{ publisher.last_name }}</a>{% if not forloop.last %}, {% endif %}
+                            <a href="{% url "catalog:redactor_detail" username=publisher.username %}">{{ publisher.first_name }} {{ publisher.last_name }}</a>{% if not forloop.last %}, {% endif %}
                         {% empty %}
                             <span>Anonymous</span>
                         {% endfor %}

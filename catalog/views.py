@@ -1,3 +1,6 @@
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -5,7 +8,7 @@ from django.views import generic
 
 from catalog.models import Newspaper, Topic, Redactor
 
-
+@login_required
 def index(request: HttpRequest) -> HttpResponse:
     latest_posts = Newspaper.objects.select_related("topic").prefetch_related(
         "publishers"
@@ -16,7 +19,7 @@ def index(request: HttpRequest) -> HttpResponse:
     }
     return render(request, "catalog/index.html", context=context)
 
-class TopicListView(generic.ListView):
+class TopicListView(LoginRequiredMixin,generic.ListView):
     model = Topic
     template_name = "catalog/topic_list.html"
     context_object_name = "topics"
@@ -27,7 +30,7 @@ class TopicListView(generic.ListView):
         ).order_by("name")
 
 
-class RedactorListView(generic.ListView):
+class RedactorListView(LoginRequiredMixin, generic.ListView):
     model = Redactor
     template_name = "catalog/redactor_list.html"
     context_object_name = "redactors"
@@ -40,7 +43,7 @@ class RedactorListView(generic.ListView):
         )
 
 
-class AllNewsListView(generic.ListView):
+class AllNewsListView(LoginRequiredMixin, generic.ListView):
     model = Newspaper
     template_name = "catalog/all_news_list.html"
     context_object_name = "newspapers"
@@ -48,7 +51,7 @@ class AllNewsListView(generic.ListView):
     slug_url_kwarg = "name"
 
 
-class TopicDetailView(generic.DetailView):
+class TopicDetailView(LoginRequiredMixin, generic.DetailView):
     model = Topic
     template_name = "catalog/topic_detail.html"
     context_object_name = "topic"
@@ -71,7 +74,7 @@ class TopicDetailView(generic.DetailView):
         )
 
 
-class RedactorDetailView(generic.DetailView):
+class RedactorDetailView(LoginRequiredMixin, generic.DetailView):
     model = Redactor
     template_name = "catalog/redactor_detail.html"
     context_object_name = "redactor"
@@ -90,7 +93,7 @@ class RedactorDetailView(generic.DetailView):
         return get_object_or_404(Redactor, username__iexact=username)
 
 
-class NewsDetailView(generic.DetailView):
+class NewsDetailView(LoginRequiredMixin, generic.DetailView):
     model = Newspaper
     template_name = "catalog/news_detail.html"
     context_object_name = "news"
