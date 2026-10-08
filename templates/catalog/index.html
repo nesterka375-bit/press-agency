@@ -6,42 +6,47 @@
 
 {% block maincontent %}
 <div class="container px-4 px-lg-5">
-    <div class="row gx-4 gx-lg-5 justify-content-center">
-        <div class="col-md-10 col-lg-8 col-xl-7">
-            <!-- Post previews -->
-            {% for post in latest_posts %}
-                <div class="post-preview">
-                    <a href="{% url "catalog:news_detail" name=post.topic.name|lower pk=post.id %}">
-                        <h2 class="post-title">{{ post.topic }}</h2>
-                        <h3 class="post-subtitle">{{ post.content|truncatechars:80 }}</h3>
-                    </a>
-                    <p class="post-meta">
-                        Posted by
-                        {% for publisher in post.publishers.all %}
-                            <a href="{% url "catalog:redactor_detail" username=publisher.username %}">{{ publisher.first_name }} {{ publisher.last_name }}</a>{% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                            <span>Anonymous</span>
-                        {% endfor %}
-                        on {{ post.published_date }}
-                    </p>
-                </div>
-                <!-- Divider -->
-                <hr class="my-4" />
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <!-- Post previews -->
+      {% for post in latest_posts %}
+        <div class="post-preview">
+          <a href="{% url "catalog:news_detail" name=post.topic.name|lower pk=post.id %}">
+            <h2 class="post-title">{{ post.topic }}</h2>
+            <h3 class="post-subtitle">{{ post.content|truncatechars:80 }}</h3>
+          </a>
+          <p class="post-meta">
+            Posted by
+            {% for publisher in post.publishers.all %}
+              <a href="{% url "catalog:redactor_detail" username=publisher.username %}">{{ publisher.first_name }} {{ publisher.last_name }}</a>{% if not forloop.last %}, {% endif %}
             {% empty %}
-                <p>No publications found.</p>
+              <span>Anonymous</span>
             {% endfor %}
-
-            <!-- Pager -->
-            <div class="row gx-4 gx-lg-5 justify-content-center mt-4 mb-5">
-              <div class="col-md-10 col-lg-8 col-xl-7">
-                <div class="d-flex justify-content-end">
-                  <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:all_news_list" %}">
-                    All news &rarr;
-                  </a>
-                </div>
-              </div>
-            </div>
+            on {{ post.published_date }}
+            {% if post.is_approved %}
+              <span class="badge bg-success fs-6 fw-normal">✓ Approved</span>
+            {% else %}
+              <span class="badge bg-warning text-dark fs-6 fw-normal">Pending</span>
+            {% endif %}
+          </p>
         </div>
-    </div>
+        <!-- Divider -->
+          <hr class="my-4" />
+        {% empty %}
+          <p>No publications found.</p>
+        {% endfor %}
+
+        <!-- Pager -->
+        <div class="row gx-4 gx-lg-5 justify-content-center mt-4 mb-5">
+          <div class="col-md-10 col-lg-8 col-xl-7">
+            <div class="d-flex justify-content-end">
+              <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:all_news_list" %}">
+                All news &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
 </div>
 {% endblock %}

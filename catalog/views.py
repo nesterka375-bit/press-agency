@@ -1,11 +1,12 @@
-from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
 from django.views import generic
 
+from catalog.forms import NewsForm
 from catalog.models import Newspaper, Topic, Redactor
 
 @login_required
@@ -101,4 +102,43 @@ class NewsDetailView(LoginRequiredMixin, generic.DetailView):
     def get_queryset(self):
         return super().get_queryset().select_related("topic").prefetch_related("publishers")
 
+
+class NewsCreateView(LoginRequiredMixin, generic.CreateView):
+  model = Newspaper
+  form_class = NewsForm
+  template_name = "catalog/news_form.html"
+
+  def get_success_url(self):
+      return reverse(
+          "catalog:news_detail",
+          kwargs={"name": self.object.topic.name.lower(), "pk": self.object.pk},
+      )
+
+
+class NewsUpdateView(LoginRequiredMixin, generic.UpdateView):
+  model = Newspaper
+  form_class = NewsForm
+  template_name = "catalog/news_form.html"
+
+  def get_success_url(self):
+    return reverse_lazy(
+        "catalog:news_detail",
+        kwargs={"name": self.object.topic.name.lower(), "pk": self.object.pk},
+    )
+
+
+class NewsDeleteView(LoginRequiredMixin, generic.DeleteView):
+  model = Newspaper
+  template_name = "catalog/news_confirm_delete.html"
+  success_url = reverse_lazy("catalog:all_news_list")
+
+
+@permission_required("catalog.change_newspaper")
+def approve_news(request, pk):
+  news = get_object_or_404(Newspaper, pk=pk)
+  news.is_approved = True
+  news.save()
+  return redirect(
+      "catalog:news_detail", name=news.topic.name.lower(), pk=news.pk
+  )
 

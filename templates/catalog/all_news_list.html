@@ -39,6 +39,11 @@
                     <span>Anonymous</span>
                   {% endfor %}
                   on {{ newspaper.published_date }}
+                  {% if newspaper.is_approved %}
+                    <span class="badge bg-success fs-6 fw-normal">✓ Approved</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark fs-6 fw-normal">Pending</span>
+                  {% endif %}
                 </p>
               </div>
         {% empty %}

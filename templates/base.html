@@ -36,9 +36,17 @@
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url "catalog:all_news_list" %}">All news</a></li>
             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">Contact</a></li>
             {% if user.is_authenticated %}
-              <li class="nav-item ms-lg-4">
+              <li class="nav-item ms-lg-3">
                 <a class="nav-link px-lg-3 py-3 py-lg-4 fw-bold" href="{% url "accounts:logout" %}">
                   Logout ({{ user.username }})
+                </a>
+              </li>
+              <li class="nav-item my-auto ms-lg-2">
+                <a class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                   style="width: 38px; height: 38px;"
+                   href="{% url 'catalog:news_create' %}"
+                   title="Add Article">
+                  <i class="fas fa-plus"></i>
                 </a>
               </li>
             {% else %}
@@ -87,6 +95,12 @@
                   <span>Anonymous</span>
                 {% endfor %}
                 on {{ post.published_date }}
+                on {{ post.published_date }}
+                {% if post.is_approved %}
+                  <span class="badge bg-success fs-6 fw-normal">✓ Approved</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark fs-6 fw-normal">Pending</span>
+                {% endif %}
               </p>
             </div>
           {% endfor %}
