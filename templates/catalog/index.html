@@ -12,41 +12,41 @@
       {% for post in latest_posts %}
         <div class="post-preview">
           <a href="{% url "catalog:news_detail" name=post.topic.name|lower pk=post.id %}">
-            <h2 class="post-title">{{ post.topic }}</h2>
+            <h2 class="post-title">{{ post.title }}</h2>
             <h3 class="post-subtitle">{{ post.content|truncatechars:80 }}</h3>
           </a>
           <p class="post-meta">
             Posted by
             {% for publisher in post.publishers.all %}
-              <a href="{% url "catalog:redactor_detail" username=publisher.username %}">{{ publisher.first_name }} {{ publisher.last_name }}</a>{% if not forloop.last %}, {% endif %}
+              <a href="{% url "catalog:redactor_detail" username=publisher.username %}">
+                {{ publisher.first_name }} {{ publisher.last_name }}
+              </a>{% if not forloop.last %}, {% endif %}
             {% empty %}
               <span>Anonymous</span>
             {% endfor %}
             on {{ post.published_date }}
-            {% if post.is_approved %}
-              <span class="badge bg-success fs-6 fw-normal">✓ Approved</span>
-            {% else %}
-              <span class="badge bg-warning text-dark fs-6 fw-normal">Pending</span>
+            {% if user in post.publishers.all or user.is_staff or user.is_superuser %}
+              {% if post.is_approved %}
+                <span class="badge bg-success fs-6 fw-normal ms-2">✓ Approved</span>
+              {% else %}
+                <span class="badge bg-warning text-dark fs-6 fw-normal ms-2">Pending</span>
+              {% endif %}
             {% endif %}
           </p>
         </div>
         <!-- Divider -->
-          <hr class="my-4" />
-        {% empty %}
-          <p>No publications found.</p>
-        {% endfor %}
+        <hr class="my-4" />
+      {% empty %}
+        <p class="text-muted text-center my-4">No publications found.</p>
+      {% endfor %}
 
-        <!-- Pager -->
-        <div class="row gx-4 gx-lg-5 justify-content-center mt-4 mb-5">
-          <div class="col-md-10 col-lg-8 col-xl-7">
-            <div class="d-flex justify-content-end">
-              <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:all_news_list" %}">
-                All news &rarr;
-              </a>
-            </div>
-          </div>
-        </div>
+      <!-- Pager -->
+      <div class="d-flex justify-content-end mt-4 mb-5">
+        <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:all_news_list" %}">
+          All news &rarr;
+        </a>
       </div>
+    </div>
   </div>
 </div>
 {% endblock %}

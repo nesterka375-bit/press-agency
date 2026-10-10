@@ -26,28 +26,33 @@
     <div class="col-md-10 col-lg-8 col-xl-7">
       <div class="list-group list-group-flush mb-5">
       {% for newspaper in redactor.newspapers.all %}
-        <div class="post-preview">
-          <a href="{% url "catalog:news_detail" name=newspaper.topic.name|lower pk=newspaper.id %}">
-            <h2 class="post-title">{{ newspaper.title }}</h2>
-            <h3 class="post-subtitle">{{ newspaper.content|truncatechars:80 }}</h3>
-          </a>
-          <p class="post-meta">
-            Topic: <a href="{% url "catalog:topic_detail" name=newspaper.topic.name|lower %}">{{ newspaper.topic.name }}</a> |
-            Published on {{ newspaper.published_date }}
-            {% if newspaper.is_approved %}
-              <span class="badge bg-success fs-6 fw-normal">✓ Approved</span>
-            {% else %}
-              <span class="badge bg-warning text-dark fs-6 fw-normal">Pending</span>
-            {% endif %}
-          </p>
-        </div>
-        <hr class="my-4" />
+        {% if newspaper.is_approved or user == redactor or user.is_staff or user.is_superuser %}
+          <div class="post-preview">
+            <a href="{% url "catalog:news_detail" name=newspaper.topic.name|lower pk=newspaper.id %}">
+              <h2 class="post-title">{{ newspaper.title }}</h2>
+              <h3 class="post-subtitle">{{ newspaper.content|truncatechars:80 }}</h3>
+            </a>
+            <p class="post-meta">
+              Topic: <a href="{% url "catalog:topic_detail" name=newspaper.topic.name|lower %}">{{ newspaper.topic.name }}</a> |
+              Published on {{ newspaper.published_date }}
+              {% if user == redactor or user.is_staff or user.is_superuser %}
+                {% if newspaper.is_approved %}
+                  <span class="badge bg-success fs-6 fw-normal ms-2">✓ Approved</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark fs-6 fw-normal ms-2">Pending</span>
+                {% endif %}
+              {% endif %}
+            </p>
+          </div>
+          <hr class="my-4" />
+        {% endif %}
       {% empty %}
         <p class="text-muted text-center my-4">No articles written by this redactor yet.</p>
       {% endfor %}
       </div>
     </div>
   </div>
+
   <div class="row gx-4 gx-lg-5 justify-content-center mt-4 mb-5">
     <div class="col-md-10 col-lg-8 col-xl-7">
       <div class="d-flex justify-content-start">

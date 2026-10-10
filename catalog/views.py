@@ -126,11 +126,29 @@ class NewsUpdateView(LoginRequiredMixin, generic.UpdateView):
         kwargs={"name": self.object.topic.name.lower(), "pk": self.object.pk},
     )
 
+  def access(self):
+      newspaper = self.get_object()
+      user = self.request.user
+      return (
+              user.is_staff
+              or user.is_superuser
+              or newspaper.publishers.filter(pk=user.pk).exists()
+      )
+
 
 class NewsDeleteView(LoginRequiredMixin, generic.DeleteView):
   model = Newspaper
   template_name = "catalog/news_confirm_delete.html"
   success_url = reverse_lazy("catalog:all_news_list")
+
+  def access(self):
+      newspaper = self.get_object()
+      user = self.request.user
+      return (
+              user.is_staff
+              or user.is_superuser
+              or newspaper.publishers.filter(pk=user.pk).exists()
+      )
 
 
 @permission_required("catalog.change_newspaper")
