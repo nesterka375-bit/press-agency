@@ -160,3 +160,5 @@ def approve_news(request, pk):
       "catalog:news_detail", name=news.topic.name.lower(), pk=news.pk
   )
 
+def contact_view(request: HttpRequest) -> HttpResponse:
+    return render(request, "catalog/contact.html")
