@@ -1,6 +1,6 @@
 from django.urls import path
 from catalog.views import index, TopicListView, RedactorListView, AllNewsListView, TopicDetailView, RedactorDetailView, \
-	NewsDetailView, NewsCreateView, NewsUpdateView, NewsDeleteView, approve_news, contact_view
+	NewsDetailView, NewsCreateView, NewsUpdateView, NewsDeleteView, contact_view
 
 app_name = "catalog"
 
@@ -16,5 +16,4 @@ urlpatterns = [
 	path("news/create/", NewsCreateView.as_view(), name="news_create"),
 	path("topics/<str:name>/<int:pk>/update/", NewsUpdateView.as_view(), name="news_update"),
     path("topics/<str:name>/<int:pk>/delete/", NewsDeleteView.as_view(), name="news_delete"),
-    path("news/<int:pk>/approve/", approve_news, name="news_approve"),
 ]

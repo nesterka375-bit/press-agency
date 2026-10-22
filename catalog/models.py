@@ -30,7 +30,6 @@ class Newspaper(models.Model):
         Topic, on_delete=models.CASCADE, related_name="newspapers"
     )
     publishers = models.ManyToManyField(Redactor, blank=True, related_name="newspapers")
-    is_approved = models.BooleanField(default=False)
 
     class Meta:
         ordering = (

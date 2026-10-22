@@ -150,15 +150,5 @@ class NewsDeleteView(LoginRequiredMixin, generic.DeleteView):
               or newspaper.publishers.filter(pk=user.pk).exists()
       )
 
-
-@permission_required("catalog.change_newspaper")
-def approve_news(request, pk):
-  news = get_object_or_404(Newspaper, pk=pk)
-  news.is_approved = True
-  news.save()
-  return redirect(
-      "catalog:news_detail", name=news.topic.name.lower(), pk=news.pk
-  )
-
 def contact_view(request: HttpRequest) -> HttpResponse:
     return render(request, "catalog/contact.html")

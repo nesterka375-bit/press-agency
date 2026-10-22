@@ -32,7 +32,7 @@
               <h3 class="post-subtitle">{{ newspaper.content|truncatechars:80 }}</h3>
             </a>
             <p class="post-meta">
-              Published by
+              Confirmed by
               {% for publisher in newspaper.publishers.all %}
                 <a href="{% url "catalog:redactor_detail" username=publisher.username %}">
                   {{ publisher.first_name }} {{ publisher.last_name }}
@@ -41,13 +41,6 @@
                 <span>Anonymous</span>
               {% endfor %}
               on {{ newspaper.published_date }}
-              {% if user in newspaper.publishers.all or user.is_staff or user.is_superuser %}
-                {% if newspaper.is_approved %}
-                  <span class="badge bg-success fs-6 fw-normal ms-2">✓ Approved</span>
-                {% else %}
-                  <span class="badge bg-warning text-dark fs-6 fw-normal ms-2">Pending</span>
-                {% endif %}
-              {% endif %}
             </p>
           </div>
           <hr class="my-4" />

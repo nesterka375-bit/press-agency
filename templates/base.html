@@ -90,17 +90,11 @@
               <p class="post-meta">
                 Published by
                 {% for publisher in post.publishers.all %}
-                  <a href="#">{{ publisher.first_name }} {{ publisher.last_name }}</a>{% if not forloop.last %}, {% endif %}
+                  <a href="{% url "catalog:redactor_detail" username=publisher.id %}">{{ publisher.first_name }} {{ publisher.last_name }}</a>{% if not forloop.last %}, {% endif %}
                 {% empty %}
                   <span>Anonymous</span>
                 {% endfor %}
                 on {{ post.published_date }}
-                on {{ post.published_date }}
-                {% if post.is_approved %}
-                  <span class="badge bg-success fs-6 fw-normal">✓ Approved</span>
-                {% else %}
-                  <span class="badge bg-warning text-dark fs-6 fw-normal">Pending</span>
-                {% endif %}
               </p>
             </div>
           {% endfor %}

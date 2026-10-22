@@ -26,7 +26,7 @@
     <div class="col-md-10 col-lg-8 col-xl-7">
       <div class="list-group list-group-flush mb-5">
       {% for newspaper in redactor.newspapers.all %}
-        {% if newspaper.is_approved or user == redactor or user.is_staff or user.is_superuser %}
+        {% if user == redactor or user.is_staff or user.is_superuser %}
           <div class="post-preview">
             <a href="{% url "catalog:news_detail" name=newspaper.topic.name|lower pk=newspaper.id %}">
               <h2 class="post-title">{{ newspaper.title }}</h2>
@@ -34,14 +34,7 @@
             </a>
             <p class="post-meta">
               Topic: <a href="{% url "catalog:topic_detail" name=newspaper.topic.name|lower %}">{{ newspaper.topic.name }}</a> |
-              Published on {{ newspaper.published_date }}
-              {% if user == redactor or user.is_staff or user.is_superuser %}
-                {% if newspaper.is_approved %}
-                  <span class="badge bg-success fs-6 fw-normal ms-2">✓ Approved</span>
-                {% else %}
-                  <span class="badge bg-warning text-dark fs-6 fw-normal ms-2">Pending</span>
-                {% endif %}
-              {% endif %}
+              Confirmed on {{ newspaper.published_date }}
             </p>
           </div>
           <hr class="my-4" />

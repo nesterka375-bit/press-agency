@@ -39,20 +39,7 @@
         {% if user.is_authenticated %}
           {% if user in news.publishers.all or user.is_staff or user.is_superuser %}
             <div class="my-4 p-3 bg-light rounded border d-flex align-items-center justify-content-between">
-              <div>
-                <span class="fw-bold me-2">Status:</span>
-                {% if news.is_approved %}
-                  <span class="badge bg-success">Approved</span>
-                {% else %}
-                  <span class="badge bg-warning text-dark">Pending Approval</span>
-                {% endif %}
-              </div>
               <div class="btn-group" role="group">
-                {% if user.is_staff and not news.is_approved %}
-                  <a href="{% url 'catalog:news_approve' pk=news.pk %}" class="btn btn-sm btn-outline-success">
-                    ✓ Approve
-                  </a>
-                {% endif %}
                 <a href="{% url 'catalog:news_update' name=news.topic.name|lower pk=news.pk %}" class="btn btn-sm btn-outline-primary">
                   Edit
                 </a>
@@ -67,7 +54,7 @@
           <h2 class="post-title">{{ news.title }}</h2>
           <p class="post-subtitle">{{ news.content }}</p>
           <p class="post-meta">
-            Published on {{ news.published_date }} by
+            Confirmed {{ news.published_date }} by
             {% for publisher in news.publishers.all %}
               {{ publisher.first_name }} {{ publisher.last_name }}{% if not forloop.last %}, {% endif %}
             {% empty %}
