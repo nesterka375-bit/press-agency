@@ -1,12 +1,14 @@
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail
 from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 
-from catalog.forms import NewsForm
+from catalog.forms import NewsForm, ContactForm
 from catalog.models import Newspaper, Topic, Redactor
 
 @login_required
@@ -151,4 +153,24 @@ class NewsDeleteView(LoginRequiredMixin, generic.DeleteView):
       )
 
 def contact_view(request: HttpRequest) -> HttpResponse:
-    return render(request, "catalog/contact.html")
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            message = form.cleaned_data["message"]
+            send_mail(
+                subject=f"Message from {name} ({email})",
+                message=message,
+                from_email=None,
+                recipient_list=["info@pressagency.com"],
+            )
+            messages.success(request, "Your message has been sent successfully!")
+            return redirect("catalog:contact")
+    else:
+        form = ContactForm()
+
+    context = {
+        "form": form,
+    }
+    return render(request, "catalog/contact.html", context=context)

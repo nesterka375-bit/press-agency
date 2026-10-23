@@ -41,20 +41,32 @@
           </div>
         </div>
         <div class="my-5">
-          <form id="contactForm" method="post" action="#">
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <form id="contactForm" method="post" novalidate>
             {% csrf_token %}
+
             <div class="form-floating mb-3">
-              <input class="form-control" id="name" type="text" placeholder="Enter your name..." required />
-              <label for="name">Name</label>
+              {{ form.name }}
+              <label for="{{ form.name.id_for_label }}">Name</label>
+              {{ form.name.errors }}
             </div>
+
             <div class="form-floating mb-3">
-              <input class="form-control" id="email" type="email" placeholder="Enter your email..." required />
-              <label for="email">Email address</label>
+              {{ form.email }}
+              <label for="{{ form.email.id_for_label }}">Email address</label>
+              {{ form.email.errors }}
             </div>
+
             <div class="form-floating mb-3">
-              <textarea class="form-control" id="message" placeholder="Enter your message here..." style="height: 12rem" required></textarea>
-              <label for="message">Message</label>
+              {{ form.message }}
+              <label for="{{ form.message.id_for_label }}">Message</label>
+              {{ form.message.errors }}
             </div>
+
             <br />
             <button class="btn btn-primary text-uppercase" id="submitButton" type="submit">Send Message</button>
           </form>
