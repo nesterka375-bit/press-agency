@@ -21,18 +21,39 @@
 {% endblock %}
 
 {% block maincontent %}
-    <!-- Search bar -->
+  <!-- Search bar & Sort -->
 <div class="row gx-4 gx-lg-5 justify-content-center mb-4" id="search-results">
   <div class="col-md-10 col-lg-8 col-xl-7">
-    <form method="get" action="{% url "catalog:redactor_detail" username=redactor.username %}#search-results" class="input-group">
-      <input type="text"
-             name="q"
-             class="form-control"
-             placeholder="Search news..."
-             value="{{ request.GET.q|default:'' }}">
-      <button class="btn btn-primary text-uppercase" type="submit">Search</button>
-      {% if request.GET.q %}
-        <a href="{% url "catalog:redactor_detail" username=redactor.username %}#search-results" class="btn btn-outline-secondary">Reset</a>
+    <form method="get" action="{% url 'catalog:redactor_detail' username=redactor.username %}#search-results">
+      <div class="input-group mb-2">
+        <!-- Search bar -->
+        <input type="text"
+               name="q"
+               class="form-control"
+               placeholder="Search news..."
+               value="{{ request.GET.q|default:'' }}">
+
+        <!-- Sort selector -->
+        <select name="sort" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
+          <option value="-published_date" {% if request.GET.sort == "-published_date" or not request.GET.sort %}selected{% endif %}>Newest first</option>
+          <option value="published_date" {% if request.GET.sort == "published_date" %}selected{% endif %}>Oldest first</option>
+          <option value="title" {% if request.GET.sort == "title" %}selected{% endif %}>Title (A-Z)</option>
+          <option value="-title" {% if request.GET.sort == "-title" %}selected{% endif %}>Title (Z-A)</option>
+          <option value="topic" {% if request.GET.sort == "topic" %}selected{% endif %}>Topics (A-Z)</option>
+          <option value="-topic" {% if request.GET.sort == "-topic" %}selected{% endif %}>Topics (Z-A)</option>
+        </select>
+
+        <!-- Button search -->
+        <button class="btn btn-primary text-uppercase" type="submit">Search</button>
+      </div>
+
+      <!-- Button reset -->
+      {% if request.GET.q or request.GET.sort %}
+        <div class="text-end">
+          <a href="{% url 'catalog:redactor_detail' username=redactor.username %}#search-results" class="text-decoration-none text-muted small">
+            <i class="fas fa-times"></i> Reset filters
+          </a>
+        </div>
       {% endif %}
     </form>
   </div>

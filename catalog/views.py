@@ -71,6 +71,18 @@ class AllNewsListView(LoginRequiredMixin, generic.ListView):
                 conditions |= Q(published_date__month=year_val)
                 conditions |= Q(published_date__day=year_val)
             queryset = queryset.filter(conditions).distinct()
+
+        sort_by = self.request.GET.get("sort", "-published_date")
+        allowed_sort_fields = {
+            "-published_date": "-published_date",
+            "published_date": "published_date",
+            "title": "title",
+            "-title": "-title",
+            "publishers": "publishers",
+            "-publishers": "-publishers",
+        }
+        if sort_by in allowed_sort_fields:
+            queryset = queryset.order_by(allowed_sort_fields[sort_by])
         return queryset
 
 
@@ -102,6 +114,18 @@ class TopicDetailView(LoginRequiredMixin, generic.DetailView):
                 conditions |= Q(published_date__day=year_val)
 
             newspapers = newspapers.filter(conditions).distinct()
+
+        sort_by = self.request.GET.get("sort", "-published_date")
+        allowed_sort_fields = {
+            "-published_date": "-published_date",
+            "published_date": "published_date",
+            "title": "title",
+            "-title": "-title",
+            "publishers": "publishers",
+            "-publishers": "-publishers",
+        }
+        if sort_by in allowed_sort_fields:
+            newspapers = newspapers.order_by(allowed_sort_fields[sort_by])
 
         context["newspapers"] = newspapers
         return context
@@ -142,6 +166,19 @@ class RedactorDetailView(LoginRequiredMixin, generic.DetailView):
                 conditions |= Q(published_date__month=year_val)
                 conditions |= Q(published_date__day=year_val)
             newspapers = newspapers.filter(conditions).distinct()
+
+        sort_by = self.request.GET.get("sort", "-published_date")
+        allowed_sort_fields = {
+            "-published_date": "-published_date",
+            "published_date": "published_date",
+            "title": "title",
+            "-title": "-title",
+            "topic": "topic__name",
+            "-topic": "-topic__name",
+        }
+        if sort_by in allowed_sort_fields:
+            newspapers = newspapers.order_by(allowed_sort_fields[sort_by])
+
         context["newspapers"] = newspapers
         return context
 
