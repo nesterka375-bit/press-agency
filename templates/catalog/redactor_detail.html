@@ -12,7 +12,7 @@
       <div class="col-md-10 col-lg-8 col-xl-7">
         <div class="site-heading">
           <h1>{{ redactor.first_name }} {{ redactor.last_name }}</h1>
-          <span class="subheading"><br>Articles published by this redactor</span>
+          <span class="subheading"><br>Articles confirmed by this redactor</span>
         </div>
       </div>
     </div>
@@ -21,11 +21,27 @@
 {% endblock %}
 
 {% block maincontent %}
+    <!-- Search bar -->
+<div class="row gx-4 gx-lg-5 justify-content-center mb-4" id="search-results">
+  <div class="col-md-10 col-lg-8 col-xl-7">
+    <form method="get" action="{% url "catalog:redactor_detail" username=redactor.username %}#search-results" class="input-group">
+      <input type="text"
+             name="q"
+             class="form-control"
+             placeholder="Search news..."
+             value="{{ request.GET.q|default:'' }}">
+      <button class="btn btn-primary text-uppercase" type="submit">Search</button>
+      {% if request.GET.q %}
+        <a href="{% url "catalog:redactor_detail" username=redactor.username %}#search-results" class="btn btn-outline-secondary">Reset</a>
+      {% endif %}
+    </form>
+  </div>
+</div>
 <div class="container px-4 px-lg-5">
   <div class="row gx-4 gx-lg-5 justify-content-center">
     <div class="col-md-10 col-lg-8 col-xl-7">
       <div class="list-group list-group-flush mb-5">
-      {% for newspaper in redactor.newspapers.all %}
+      {% for newspaper in newspapers %}
         {% if user == redactor or user.is_staff or user.is_superuser %}
           <div class="post-preview">
             <a href="{% url "catalog:news_detail" name=newspaper.topic.name|lower pk=newspaper.id %}">

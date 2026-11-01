@@ -21,12 +21,28 @@
 {% endblock %}
 
 {% block maincontent %}
+  <!-- Search bar -->
+<div class="row gx-4 gx-lg-5 justify-content-center mb-4" id="search-results">
+  <div class="col-md-10 col-lg-8 col-xl-7">
+    <form method="get" action="{% url "catalog:topic_detail" name=topic.name %}#search-results" class="input-group">
+      <input type="text"
+             name="q"
+             class="form-control"
+             placeholder="Search news..."
+             value="{{ request.GET.q|default:'' }}">
+      <button class="btn btn-primary text-uppercase" type="submit">Search</button>
+      {% if request.GET.q %}
+        <a href="{% url "catalog:topic_detail" name=topic.name %}#search-results" class="btn btn-outline-secondary">Reset</a>
+      {% endif %}
+    </form>
+  </div>
+</div>
 <div class="container">
   <div class="container px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
         <div class="list-group list-group-flush mb-5">
-        {% for newspaper in topic.newspapers.all %}
+        {% for newspaper in newspapers %}
           <div class="post-preview">
                 <a href="{% url "catalog:news_detail" name=topic.name|lower pk=newspaper.id %}">
                   <h2 class="post-title">{{ newspaper.title }}</h2>

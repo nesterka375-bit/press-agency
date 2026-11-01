@@ -2,7 +2,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
-from django.db.models import Count
+from django.db import models
+from django.db.models import Count, Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
@@ -10,6 +11,7 @@ from django.views import generic
 
 from catalog.forms import NewsForm, ContactForm
 from catalog.models import Newspaper, Topic, Redactor
+
 
 @login_required
 def index(request: HttpRequest) -> HttpResponse:
@@ -53,6 +55,24 @@ class AllNewsListView(LoginRequiredMixin, generic.ListView):
     slug_field = "name"
     slug_url_kwarg = "name"
 
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related("topic").prefetch_related("publishers")
+        query = self.request.GET.get("q")
+        if query:
+            conditions = (
+                    Q(title__icontains=query) |
+                    Q(content__icontains=query) |
+                    Q(publishers__first_name__icontains=query) |
+                    Q(publishers__last_name__icontains=query)
+            )
+            if query.isdigit():
+                year_val = int(query)
+                conditions |= Q(published_date__year=year_val)
+                conditions |= Q(published_date__month=year_val)
+                conditions |= Q(published_date__day=year_val)
+            queryset = queryset.filter(conditions).distinct()
+        return queryset
+
 
 class TopicDetailView(LoginRequiredMixin, generic.DetailView):
     model = Topic
@@ -63,6 +83,28 @@ class TopicDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_queryset(self):
         return super().get_queryset().prefetch_related("newspapers__publishers")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        newspapers = self.object.newspapers.select_related("topic").prefetch_related("publishers").all()
+        query = self.request.GET.get("q")
+        if query:
+            conditions = (
+                    Q(title__icontains=query) |
+                    Q(content__icontains=query) |
+                    Q(publishers__first_name__icontains=query) |
+                    Q(publishers__last_name__icontains=query)
+            )
+            if query.isdigit():
+                year_val = int(query)
+                conditions |= Q(published_date__year=year_val)
+                conditions |= Q(published_date__month=year_val)
+                conditions |= Q(published_date__day=year_val)
+
+            newspapers = newspapers.filter(conditions).distinct()
+
+        context["newspapers"] = newspapers
+        return context
 
     def get_object(self, queryset=None):
         name = self.kwargs.get("name")
@@ -84,12 +126,24 @@ class RedactorDetailView(LoginRequiredMixin, generic.DetailView):
     slug_field = "username"
     slug_url_kwarg = "username"
 
-    def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .prefetch_related("newspapers__topic", "newspapers__publishers")
-        )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        newspapers = self.object.newspapers.select_related("topic").prefetch_related("publishers").all()
+        query = self.request.GET.get("q")
+        if query:
+            conditions = (
+                    Q(title__icontains=query) |
+                    Q(content__icontains=query) |
+                    Q(topic__name__icontains=query)
+            )
+            if query.isdigit():
+                year_val = int(query)
+                conditions |= Q(published_date__year=year_val)
+                conditions |= Q(published_date__month=year_val)
+                conditions |= Q(published_date__day=year_val)
+            newspapers = newspapers.filter(conditions).distinct()
+        context["newspapers"] = newspapers
+        return context
 
     def get_object(self, queryset=None):
         username = self.kwargs.get("username")
