@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>All news - Press Agency</title>
+{% endblock %}
+
+{% block header %}
+  <header class="masthead" style="background-image: url('{% static "assets/img/all_news-bg.jpg" %}')">
+    <div class="container position-relative px-4 px-lg-5">
+      <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
+          <div class="site-heading">
+            <h1>All news</h1>
+            <span class="subheading"><br>Browse all news</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+{% endblock %}
+
+{% block maincontent %}
+<!-- Search bar & Sort -->
+<div class="row gx-4 gx-lg-5 justify-content-center mb-4" id="search-results">
+  <div class="col-md-10 col-lg-8 col-xl-7">
+    <form method="get" action="{% url 'catalog:all_news_list' %}#search-results">
+      <div class="input-group mb-2">
+        <!-- Search bar -->
+        <input type="text"
+               name="q"
+               class="form-control"
+               placeholder="Search news..."
+               value="{{ request.GET.q|default:'' }}">
+
+        <!-- Sort selector -->
+        <select name="sort" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
+          <option value="-published_date" {% if request.GET.sort == "-published_date" or not request.GET.sort %}selected{% endif %}>Newest first</option>
+          <option value="published_date" {% if request.GET.sort == "published_date" %}selected{% endif %}>Oldest first</option>
+          <option value="title" {% if request.GET.sort == "title" %}selected{% endif %}>Title (A-Z)</option>
+          <option value="-title" {% if request.GET.sort == "-title" %}selected{% endif %}>Title (Z-A)</option>
+          <option value="publishers" {% if request.GET.sort == "publishers" %}selected{% endif %}>Publishers (A-Z)</option>
+          <option value="-publishers" {% if request.GET.sort == "-publishers" %}selected{% endif %}>Publishers (Z-A)</option>
+        </select>
+
+        <!-- Button search -->
+        <button class="btn btn-primary text-uppercase" type="submit">Search</button>
+      </div>
+
+      <!-- Button reset -->
+      {% if request.GET.q or request.GET.sort %}
+        <div class="text-end">
+          <a href="{% url 'catalog:all_news_list' %}#search-results" class="text-decoration-none text-muted small">
+            <i class="fas fa-times"></i> Reset filters
+          </a>
+        </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <div class="list-group list-group-flush mb-5">
+        {% for newspaper in newspapers %}
+          <div class="post-preview">
+            <a href="{% url "catalog:news_detail" name=newspaper.topic.name|lower pk=newspaper.id %}">
+              <h2 class="post-title">{{ newspaper.title }}</h2>
+              <h3 class="post-subtitle">{{ newspaper.content|truncatechars:80 }}</h3>
+            </a>
+            <p class="post-meta">
+              Confirmed by
+              {% for publisher in newspaper.publishers.all %}
+                <a href="{% url "catalog:redactor_detail" username=publisher.username %}">
+                  {{ publisher.first_name }} {{ publisher.last_name }}
+                </a>{% if not forloop.last %}, {% endif %}
+              {% empty %}
+                <span>Anonymous</span>
+              {% endfor %}
+              on {{ newspaper.published_date }}
+            </p>
+          </div>
+          <hr class="my-4" />
+        {% empty %}
+          <p class="text-center my-4">No articles found.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="row gx-4 gx-lg-5 justify-content-center mt-2 mb-5">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <div class="d-flex justify-content-start">
+        <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:index" %}">
+          &larr; Back to home
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

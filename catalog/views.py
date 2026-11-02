@@ -1,0 +1,286 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail
+from django.db.models import Count, Q
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
+from django.views import generic
+
+from catalog.forms import NewsForm, ContactForm
+from catalog.models import Newspaper, Topic, Redactor
+
+
+@login_required
+def index(request: HttpRequest) -> HttpResponse:
+    latest_posts = Newspaper.objects.select_related("topic").prefetch_related(
+        "publishers"
+    )[:5]
+
+    context = {
+        "latest_posts": latest_posts,
+    }
+    return render(request, "catalog/index.html", context=context)
+
+
+class TopicListView(LoginRequiredMixin, generic.ListView):
+    model = Topic
+    template_name = "catalog/topic_list.html"
+    context_object_name = "topics"
+
+    def get_queryset(self):
+        return Topic.objects.annotate(newspapers_count=Count("newspapers")).order_by(
+            "name"
+        )
+
+
+class RedactorListView(LoginRequiredMixin, generic.ListView):
+    model = Redactor
+    template_name = "catalog/redactor_list.html"
+    context_object_name = "redactors"
+
+    def get_queryset(self):
+        return (
+            Redactor.objects.exclude(username="admin")
+            .annotate(newspapers_count=Count("newspapers"))
+            .order_by("username")
+        )
+
+
+class AllNewsListView(LoginRequiredMixin, generic.ListView):
+    model = Newspaper
+    template_name = "catalog/all_news_list.html"
+    context_object_name = "newspapers"
+    slug_field = "name"
+    slug_url_kwarg = "name"
+
+    def get_queryset(self):
+        queryset = (
+            super()
+            .get_queryset()
+            .select_related("topic")
+            .prefetch_related("publishers")
+        )
+        query = self.request.GET.get("q")
+        if query:
+            conditions = (
+                Q(title__icontains=query)
+                | Q(content__icontains=query)
+                | Q(publishers__first_name__icontains=query)
+                | Q(publishers__last_name__icontains=query)
+            )
+            if query.isdigit():
+                year_val = int(query)
+                conditions |= Q(published_date__year=year_val)
+                conditions |= Q(published_date__month=year_val)
+                conditions |= Q(published_date__day=year_val)
+            queryset = queryset.filter(conditions).distinct()
+
+        sort_by = self.request.GET.get("sort", "-published_date")
+        allowed_sort_fields = {
+            "-published_date": "-published_date",
+            "published_date": "published_date",
+            "title": "title",
+            "-title": "-title",
+            "publishers": "publishers",
+            "-publishers": "-publishers",
+        }
+        if sort_by in allowed_sort_fields:
+            queryset = queryset.order_by(allowed_sort_fields[sort_by])
+        return queryset
+
+
+class TopicDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Topic
+    template_name = "catalog/topic_detail.html"
+    context_object_name = "topic"
+    slug_field = "name"
+    slug_url_kwarg = "name"
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("newspapers__publishers")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        newspapers = (
+            self.object.newspapers.select_related("topic")
+            .prefetch_related("publishers")
+            .all()
+        )
+        query = self.request.GET.get("q")
+        if query:
+            conditions = (
+                Q(title__icontains=query)
+                | Q(content__icontains=query)
+                | Q(publishers__first_name__icontains=query)
+                | Q(publishers__last_name__icontains=query)
+            )
+            if query.isdigit():
+                year_val = int(query)
+                conditions |= Q(published_date__year=year_val)
+                conditions |= Q(published_date__month=year_val)
+                conditions |= Q(published_date__day=year_val)
+
+            newspapers = newspapers.filter(conditions).distinct()
+
+        sort_by = self.request.GET.get("sort", "-published_date")
+        allowed_sort_fields = {
+            "-published_date": "-published_date",
+            "published_date": "published_date",
+            "title": "title",
+            "-title": "-title",
+            "publishers": "publishers",
+            "-publishers": "-publishers",
+        }
+        if sort_by in allowed_sort_fields:
+            newspapers = newspapers.order_by(allowed_sort_fields[sort_by])
+
+        context["newspapers"] = newspapers
+        return context
+
+    def get_object(self, queryset=None):
+        name = self.kwargs.get("name")
+        topic = Topic.objects.filter(name__iexact=name).first()
+        if not topic:
+            for t in Topic.objects.all():
+                if t.name.lower() == name.lower():
+                    topic = t
+                    break
+        return get_object_or_404(
+            Topic.objects.filter(pk=topic.pk) if topic else Topic.objects.none()
+        )
+
+
+class RedactorDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Redactor
+    template_name = "catalog/redactor_detail.html"
+    context_object_name = "redactor"
+    slug_field = "username"
+    slug_url_kwarg = "username"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        newspapers = (
+            self.object.newspapers.select_related("topic")
+            .prefetch_related("publishers")
+            .all()
+        )
+        query = self.request.GET.get("q")
+        if query:
+            conditions = (
+                Q(title__icontains=query)
+                | Q(content__icontains=query)
+                | Q(topic__name__icontains=query)
+            )
+            if query.isdigit():
+                year_val = int(query)
+                conditions |= Q(published_date__year=year_val)
+                conditions |= Q(published_date__month=year_val)
+                conditions |= Q(published_date__day=year_val)
+            newspapers = newspapers.filter(conditions).distinct()
+
+        sort_by = self.request.GET.get("sort", "-published_date")
+        allowed_sort_fields = {
+            "-published_date": "-published_date",
+            "published_date": "published_date",
+            "title": "title",
+            "-title": "-title",
+            "topic": "topic__name",
+            "-topic": "-topic__name",
+        }
+        if sort_by in allowed_sort_fields:
+            newspapers = newspapers.order_by(allowed_sort_fields[sort_by])
+
+        context["newspapers"] = newspapers
+        return context
+
+    def get_object(self, queryset=None):
+        username = self.kwargs.get("username")
+        return get_object_or_404(Redactor, username__iexact=username)
+
+
+class NewsDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Newspaper
+    template_name = "catalog/news_detail.html"
+    context_object_name = "news"
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("topic")
+            .prefetch_related("publishers")
+        )
+
+
+class NewsCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Newspaper
+    form_class = NewsForm
+    template_name = "catalog/news_form.html"
+
+    def get_success_url(self):
+        return reverse(
+            "catalog:news_detail",
+            kwargs={"name": self.object.topic.name.lower(), "pk": self.object.pk},
+        )
+
+
+class NewsUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Newspaper
+    form_class = NewsForm
+    template_name = "catalog/news_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "catalog:news_detail",
+            kwargs={"name": self.object.topic.name.lower(), "pk": self.object.pk},
+        )
+
+    def access(self):
+        newspaper = self.get_object()
+        user = self.request.user
+        return (
+            user.is_staff
+            or user.is_superuser
+            or newspaper.publishers.filter(pk=user.pk).exists()
+        )
+
+
+class NewsDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Newspaper
+    template_name = "catalog/news_confirm_delete.html"
+    success_url = reverse_lazy("catalog:all_news_list")
+
+    def access(self):
+        newspaper = self.get_object()
+        user = self.request.user
+        return (
+            user.is_staff
+            or user.is_superuser
+            or newspaper.publishers.filter(pk=user.pk).exists()
+        )
+
+
+def contact_view(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            message = form.cleaned_data["message"]
+            send_mail(
+                subject=f"Message from {name} ({email})",
+                message=message,
+                from_email=None,
+                recipient_list=["info@pressagency.com"],
+            )
+            messages.success(request, "Your message has been sent successfully!")
+            return redirect("catalog:contact")
+    else:
+        form = ContactForm()
+
+    context = {
+        "form": form,
+    }
+    return render(request, "catalog/contact.html", context=context)

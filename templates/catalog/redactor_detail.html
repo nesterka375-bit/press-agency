@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>{{ redactor.first_name }} {{ redactor.last_name }} - Press Agency</title>
+{% endblock %}
+
+{% block header %}
+<header class="masthead" style="background-image: url('{% static "assets/img/redactors-bg.jpg" %}');">
+  <div class="position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="site-heading">
+          <h1>{{ redactor.first_name }} {{ redactor.last_name }}</h1>
+          <span class="subheading"><br>Articles confirmed by this redactor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block maincontent %}
+  <!-- Search bar & Sort -->
+<div class="row gx-4 gx-lg-5 justify-content-center mb-4" id="search-results">
+  <div class="col-md-10 col-lg-8 col-xl-7">
+    <form method="get" action="{% url 'catalog:redactor_detail' username=redactor.username %}#search-results">
+      <div class="input-group mb-2">
+        <!-- Search bar -->
+        <input type="text"
+               name="q"
+               class="form-control"
+               placeholder="Search news..."
+               value="{{ request.GET.q|default:'' }}">
+
+        <!-- Sort selector -->
+        <select name="sort" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
+          <option value="-published_date" {% if request.GET.sort == "-published_date" or not request.GET.sort %}selected{% endif %}>Newest first</option>
+          <option value="published_date" {% if request.GET.sort == "published_date" %}selected{% endif %}>Oldest first</option>
+          <option value="title" {% if request.GET.sort == "title" %}selected{% endif %}>Title (A-Z)</option>
+          <option value="-title" {% if request.GET.sort == "-title" %}selected{% endif %}>Title (Z-A)</option>
+          <option value="topic" {% if request.GET.sort == "topic" %}selected{% endif %}>Topics (A-Z)</option>
+          <option value="-topic" {% if request.GET.sort == "-topic" %}selected{% endif %}>Topics (Z-A)</option>
+        </select>
+
+        <!-- Button search -->
+        <button class="btn btn-primary text-uppercase" type="submit">Search</button>
+      </div>
+
+      <!-- Button reset -->
+      {% if request.GET.q or request.GET.sort %}
+        <div class="text-end">
+          <a href="{% url 'catalog:redactor_detail' username=redactor.username %}#search-results" class="text-decoration-none text-muted small">
+            <i class="fas fa-times"></i> Reset filters
+          </a>
+        </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <div class="list-group list-group-flush mb-5">
+      {% for newspaper in newspapers %}
+        {% if user == redactor or user.is_staff or user.is_superuser %}
+          <div class="post-preview">
+            <a href="{% url "catalog:news_detail" name=newspaper.topic.name|lower pk=newspaper.id %}">
+              <h2 class="post-title">{{ newspaper.title }}</h2>
+              <h3 class="post-subtitle">{{ newspaper.content|truncatechars:80 }}</h3>
+            </a>
+            <p class="post-meta">
+              Topic: <a href="{% url "catalog:topic_detail" name=newspaper.topic.name|lower %}">{{ newspaper.topic.name }}</a> |
+              Confirmed on {{ newspaper.published_date }}
+            </p>
+          </div>
+          <hr class="my-4" />
+        {% endif %}
+      {% empty %}
+        <p class="text-muted text-center my-4">No articles written by this redactor yet.</p>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row gx-4 gx-lg-5 justify-content-center mt-4 mb-5">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <div class="d-flex justify-content-start">
+        <a class="btn btn-outline-primary text-uppercase" href="{% url "catalog:redactor_list" %}">
+          &larr; Back to redactors
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
