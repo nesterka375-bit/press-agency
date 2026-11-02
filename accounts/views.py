@@ -10,7 +10,6 @@ class CustomLoginView(LoginView):
 
 
 class CustomLogoutView(View):
-
-  def get(self, request):
-    logout(request)
-    return redirect("catalog:index")
+    def get(self, request):
+        logout(request)
+        return redirect("catalog:index")

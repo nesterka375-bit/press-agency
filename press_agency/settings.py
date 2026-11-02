@@ -118,7 +118,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Или папка, в которой у вас лежат assets, css, js
+    BASE_DIR / "static",
 ]
 
 
